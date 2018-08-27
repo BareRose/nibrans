@@ -8,7 +8,7 @@ If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 */
 
 /*
-Compile using "gcc -O2 test.c" or equivalent, then run from command line to see the results.
+Compile using "gcc -O2 tenc.c -o tenc.exe" or equivalent, then run from command line to use.
 Most modern systems will have SSE2 enabled by default, if not you need a flag like "-msse2".
 If you find an error in this test or discover a possible improvement, please open an issue.
 */
