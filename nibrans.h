@@ -16,9 +16,13 @@ nibrans supports the following three configurations:
 #define NIBRANS_STATIC
     Defines all nibrans functions as static, useful if nibrans is only used in a single compilation unit.
 
-nibrans parameters:
-    NIBRANS_NO_SSE2 disables all SSE2 optimizations, which will likely make nibrans perform badly.
-    NIBRANS_CTZ(V) overrides the count trailing zeroes function used by nibrans with your own.
+nibrans supports the following additional options:
+#define NIBRANS_NO_SSE2
+    Disables all SSE2 optimizations, which will likely make nibrans perform badly and is not recommended.
+#define NIBRANS_RATE_BITS
+    Number of bits for adaption rate, higher meaning slower. Must be less than 14. Default value is 6.
+#define NIBRANS_CTZ(V)
+    Overrides the count trailing zeroes function used by nibrans with your own, unnecessary for gcc.
 
 nibrans performance:
     The modeling (which is typically the most expensive aspect of adaptive entropy coding) makes use
@@ -68,9 +72,11 @@ NBRADEF size_t nibransDecode(struct nibrans*, unsigned char*, size_t, const unsi
 #ifdef NIBRANS_IMPLEMENTATION
 
 //constants
+#ifndef NIBRANS_RATE_BITS
+    #define NIBRANS_RATE_BITS 6 //number of rate bits for adaption shift
+#endif
 #define NBRA_CODE_BITS 24 //number of bits for coding
 #define NBRA_PROB_BITS 14 //number of bits for probability
-#define NBRA_RATE_BITS 7 //number of rate bits for adaption shift
 #define NBRA_CODE_NORM (1 << NBRA_CODE_BITS) //lower bound for normalization
 #define NBRA_PROB_SIZE (1 << NBRA_PROB_BITS) //total for probability factors
 #define NBRA_CHNK_SIZE 4096 //number of bytes per chunk
@@ -348,13 +354,13 @@ static void nbraModUpdate (uint16_t cdf[17], unsigned char c) {
         //load already aligned cdf values into SSE2 values
         __m128i cdf1 = _mm_load_si128((__m128i*)&cdf[1]);
         __m128i cdf9 = _mm_load_si128((__m128i*)&cdf[9]);
-        //do calculations and store in model: cdf += (mix - cdf) >> NBRA_RATE_BITS
-        *(__m128i*)&cdf[1] = _mm_add_epi16(cdf1, _mm_srai_epi16(_mm_sub_epi16(*(__m128i*)&mixin[c][0], cdf1), NBRA_RATE_BITS));
-        *(__m128i*)&cdf[9] = _mm_add_epi16(cdf9, _mm_srai_epi16(_mm_sub_epi16(*(__m128i*)&mixin[c][8], cdf9), NBRA_RATE_BITS));
+        //do calculations and store in model: cdf += (mix - cdf) >> NIBRANS_RATE_BITS
+        *(__m128i*)&cdf[1] = _mm_add_epi16(cdf1, _mm_srai_epi16(_mm_sub_epi16(*(__m128i*)&mixin[c][0], cdf1), NIBRANS_RATE_BITS));
+        *(__m128i*)&cdf[9] = _mm_add_epi16(cdf9, _mm_srai_epi16(_mm_sub_epi16(*(__m128i*)&mixin[c][8], cdf9), NIBRANS_RATE_BITS));
     #else
         //no SSE variant (shifted up to avoid subtraction underflow)
         for (int i = 1; i < 16; i++)
-            cdf[i] = (((uint32_t)cdf[i] << NBRA_RATE_BITS) + mixin[c][i-1] - cdf[i]) >> NBRA_RATE_BITS;
+            cdf[i] = (((uint32_t)cdf[i] << NIBRANS_RATE_BITS) + mixin[c][i-1] - cdf[i]) >> NIBRANS_RATE_BITS;
     #endif
 }
 
