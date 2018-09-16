@@ -30,7 +30,7 @@ nibrans performance:
     In some use cases you may want to give nibrans its own thread so it doesn't hinder the main thread.
 */
 
-//include only once
+//header section
 #ifndef NIBRANS_H
 #define NIBRANS_H
 
@@ -68,8 +68,11 @@ NBRADEF size_t nibransDecode(struct nibrans*, unsigned char*, size_t, const unsi
     //to decode only a single chunk, simply pass in an output size of at most 4096 bytes.
     //returns number of bytes read from input, or 0 on failure (e.g. buffer too small)
 
+#endif //NIBRANS_H
+
 //implementation section
 #ifdef NIBRANS_IMPLEMENTATION
+#undef NIBRANS_IMPLEMENTATION
 
 //constants
 #ifndef NIBRANS_RATE_BITS
@@ -365,4 +368,3 @@ static void nbraModUpdate (uint16_t cdf[17], unsigned char c) {
 }
 
 #endif //NIBRANS_IMPLEMENTATION
-#endif //NIBRANS_H

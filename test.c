@@ -88,7 +88,7 @@ int main () {
                 enc_size = nibransEncode(&nbra, enc, BUFF_SIZE, tests[i].data, tests[i].size);
             }
             double end = getTime();
-            printf("Encode: %.3fms (%.3fMB/s)\n", 1000.0*(end-start)/64.0, tests[i].size/1048576.0 * 64.0/(end-start));
+            printf("Encode: %.3fms (%.3fMiB/s)\n", 1000.0*(end-start)/64.0, tests[i].size/1048576.0 * 64.0/(end-start));
             //decode benchmark
             start = getTime();
             for (int x = 0; x < 64; x++) {
@@ -96,7 +96,7 @@ int main () {
                 nibransDecode(&nbra, dec, tests[i].size, enc, enc_size);
             }
             end = getTime();
-            printf("Decode: %.3fms (%.3fMB/s)\n", 1000.0*(end-start)/64.0, tests[i].size/1048576.0 * 64.0/(end-start));
+            printf("Decode: %.3fms (%.3fMiB/s)\n", 1000.0*(end-start)/64.0, tests[i].size/1048576.0 * 64.0/(end-start));
             //print passed
             printf("<<TEST %d PASSED>>\n", i);
         }
