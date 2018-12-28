@@ -74,30 +74,7 @@ NBRADEF size_t nibransDecode(struct nibrans*, unsigned char*, size_t, const unsi
 #ifdef NIBRANS_IMPLEMENTATION
 #undef NIBRANS_IMPLEMENTATION
 
-//constants
-#ifndef NIBRANS_RATE_BITS
-    #define NIBRANS_RATE_BITS 6 //number of rate bits for adaption shift
-#endif
-#define NBRA_CODE_BITS 24 //number of bits for coding
-#define NBRA_PROB_BITS 14 //number of bits for probability
-#define NBRA_CODE_NORM (1 << NBRA_CODE_BITS) //lower bound for normalization
-#define NBRA_PROB_SIZE (1 << NBRA_PROB_BITS) //total for probability factors
-#define NBRA_CHNK_SIZE 4096 //number of bytes per chunk
-
 //macros
-#define NBRA_MIXIN(I, J) (J+1) + ((I < (J+1)) ? NBRA_PROB_SIZE - 16 : 0)
-#define NBRA_MIXIN_I(I) \
-    {NBRA_MIXIN(I, 0), NBRA_MIXIN(I, 1), NBRA_MIXIN(I, 2), NBRA_MIXIN(I, 3), \
-    NBRA_MIXIN(I, 4), NBRA_MIXIN(I, 5), NBRA_MIXIN(I, 6), NBRA_MIXIN(I, 7), \
-    NBRA_MIXIN(I, 8), NBRA_MIXIN(I, 9), NBRA_MIXIN(I, 10), NBRA_MIXIN(I, 11), \
-    NBRA_MIXIN(I, 12), NBRA_MIXIN(I, 13), NBRA_MIXIN(I, 14), NBRA_MIXIN(I, 15)}
-#define NBRA_MIXIN_INIT \
-    {NBRA_MIXIN_I(0), NBRA_MIXIN_I(1), NBRA_MIXIN_I(2), NBRA_MIXIN_I(3), \
-    NBRA_MIXIN_I(4), NBRA_MIXIN_I(5), NBRA_MIXIN_I(6), NBRA_MIXIN_I(7), \
-    NBRA_MIXIN_I(8), NBRA_MIXIN_I(9), NBRA_MIXIN_I(10), NBRA_MIXIN_I(11), \
-    NBRA_MIXIN_I(12), NBRA_MIXIN_I(13), NBRA_MIXIN_I(14), NBRA_MIXIN_I(15)}
-
-//detect ctz function
 #ifndef NIBRANS_CTZ
     #ifdef __GNUC__
         #define NIBRANS_CTZ(V) __builtin_ctz(V)
@@ -112,6 +89,27 @@ NBRADEF size_t nibransDecode(struct nibrans*, unsigned char*, size_t, const unsi
         }
     #endif
 #endif
+#define NBRA_MIXIN(I, J) (J+1) + ((I < (J+1)) ? NBRA_PROB_SIZE - 16 : 0)
+#define NBRA_MIXIN_I(I) \
+    {NBRA_MIXIN(I, 0), NBRA_MIXIN(I, 1), NBRA_MIXIN(I, 2), NBRA_MIXIN(I, 3), \
+    NBRA_MIXIN(I, 4), NBRA_MIXIN(I, 5), NBRA_MIXIN(I, 6), NBRA_MIXIN(I, 7), \
+    NBRA_MIXIN(I, 8), NBRA_MIXIN(I, 9), NBRA_MIXIN(I, 10), NBRA_MIXIN(I, 11), \
+    NBRA_MIXIN(I, 12), NBRA_MIXIN(I, 13), NBRA_MIXIN(I, 14), NBRA_MIXIN(I, 15)}
+#define NBRA_MIXIN_INIT \
+    {NBRA_MIXIN_I(0), NBRA_MIXIN_I(1), NBRA_MIXIN_I(2), NBRA_MIXIN_I(3), \
+    NBRA_MIXIN_I(4), NBRA_MIXIN_I(5), NBRA_MIXIN_I(6), NBRA_MIXIN_I(7), \
+    NBRA_MIXIN_I(8), NBRA_MIXIN_I(9), NBRA_MIXIN_I(10), NBRA_MIXIN_I(11), \
+    NBRA_MIXIN_I(12), NBRA_MIXIN_I(13), NBRA_MIXIN_I(14), NBRA_MIXIN_I(15)}
+
+//constants
+#ifndef NIBRANS_RATE_BITS
+    #define NIBRANS_RATE_BITS 6 //number of rate bits for adaption shift
+#endif
+#define NBRA_CODE_BITS 24 //number of bits for coding
+#define NBRA_PROB_BITS 14 //number of bits for probability
+#define NBRA_CODE_NORM (1 << NBRA_CODE_BITS) //lower bound for normalization
+#define NBRA_PROB_SIZE (1 << NBRA_PROB_BITS) //total for probability factors
+#define NBRA_CHNK_SIZE 4096 //number of bytes per chunk
 
 //includes
 #ifndef NIBRANS_NO_SSE2
