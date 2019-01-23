@@ -30,7 +30,7 @@ struct test {
 //test inputs
 const struct test tests[] = {
     //0: quick brown fox
-    {89, "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."},
+    {89, (unsigned char*)"The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."},
     //1: one and a half chunks of 0
     {6144, (unsigned char[6144]){0}},
     //2: full megabyte of data

@@ -33,11 +33,11 @@ int main (int argc, char *argv[]) {
         size_t in_size = ftell(fin);
         fseek(fin, 0, SEEK_SET);
         //shitty copy into memory
-        unsigned char* in = malloc(in_size);
+        unsigned char* in = (unsigned char*)malloc(in_size);
         fread(in, in_size, 1, fin);
         //out buffer to in_size + 1728
         size_t out_size = in_size + 1728;
-        unsigned char* out = malloc(out_size);
+        unsigned char* out = (unsigned char*)malloc(out_size);
         //write decoded size prefix
         out[0] = in_size >> 24;
         out[1] = in_size >> 16;

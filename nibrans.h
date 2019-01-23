@@ -89,6 +89,11 @@ NBRADEF size_t nibransDecode(struct nibrans*, unsigned char*, size_t, const unsi
         }
     #endif
 #endif
+#ifdef __cplusplus
+    #define NBRA_ALIGN16(A) A alignas(16)
+#else
+    #define NBRA_ALIGN16(A) alignas(16) A
+#endif
 #define NBRA_MIXIN(I, J) (J+1) + ((I < (J+1)) ? NBRA_PROB_SIZE - 16 : 0)
 #define NBRA_MIXIN_I(I) \
     {NBRA_MIXIN(I, 0), NBRA_MIXIN(I, 1), NBRA_MIXIN(I, 2), NBRA_MIXIN(I, 3), \
@@ -146,7 +151,8 @@ NBRADEF size_t nibransEncode (struct nibrans* nbra, unsigned char* out, size_t o
     //prepare variables and aligned cdf copies
     unsigned char* out_cur = out; const unsigned char* in_cur = in;
     size_t out_rem = out_size, in_rem = in_size, ret;
-    alignas(16) uint16_t cdf1_align[24], cdf2_align[24];
+    uint16_t NBRA_ALIGN16(cdf1_align[24]);
+    uint16_t NBRA_ALIGN16(cdf2_align[24]);
     //7 in so that cdf[1] is 16 aligned
     uint16_t* cdf1 = &cdf1_align[7];
     uint16_t* cdf2 = &cdf2_align[7];
@@ -176,7 +182,8 @@ NBRADEF size_t nibransDecode (struct nibrans* nbra, unsigned char* out, size_t o
     //prepare variables and aligned cdf copies
     unsigned char* out_cur = out; const unsigned char* in_cur = in;
     size_t out_rem = out_size, in_rem = in_size, ret;
-    alignas(16) uint16_t cdf1_align[24], cdf2_align[24];
+    uint16_t NBRA_ALIGN16(cdf1_align[24]);
+    uint16_t NBRA_ALIGN16(cdf2_align[24]);
     //7 in so that cdf[1] is 16 aligned
     uint16_t* cdf1 = &cdf1_align[7];
     uint16_t* cdf2 = &cdf2_align[7];
@@ -329,7 +336,7 @@ static uint16_t nbraDecGet (const uint32_t* c) {
 }
 static struct nbra_range nbraModRange (const uint16_t cdf[17], unsigned char c) {
     //returns the range for given symbol in given model
-    return (struct nbra_range){cdf[c], cdf[c+1] - cdf[c]};
+    return (struct nbra_range){cdf[c], (uint16_t)(cdf[c+1] - cdf[c])};
 }
 static unsigned char nbraModSymbol (const uint16_t cdf[17], uint16_t prb) {
     //returns the symbol the range of which matches the given prb in given model
@@ -350,7 +357,7 @@ static unsigned char nbraModSymbol (const uint16_t cdf[17], uint16_t prb) {
 }
 static void nbraModUpdate (uint16_t cdf[17], unsigned char c) {
     //updates the given model, registering an occurence of given symbol
-    static const alignas(16) uint16_t mixin[16][16] = NBRA_MIXIN_INIT;
+    static const uint16_t NBRA_ALIGN16(mixin[16][16]) = NBRA_MIXIN_INIT;
     #ifndef NIBRANS_NO_SSE2
         //load already aligned cdf values into SSE2 values
         __m128i cdf1 = _mm_load_si128((__m128i*)&cdf[1]);
